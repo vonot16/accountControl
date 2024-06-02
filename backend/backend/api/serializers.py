@@ -1,6 +1,11 @@
+from rest_framework import serializers
+from rest_framework import status
+from rest_framework.response import Response
+
 from .models import User
 from .models import Bills
-from rest_framework import serializers
+from .models import billsCategory
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -16,6 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
 
 class BillsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,4 +45,19 @@ class BillsSerializer(serializers.ModelSerializer):
         instance = self.Meta.model(owner_user=owner_user, **validated_data)
         instance.save()
 
+        return instance
+
+
+class BillsCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = billsCategory
+        fields = '__all__'
+
+    def create(self, validated_data):
+        class Meta:
+            model = billsCategory
+            fields = '__all__'
+
+        instance = self.Meta.model(**validated_data)
+        instance.save()
         return instance

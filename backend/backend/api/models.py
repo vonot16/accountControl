@@ -33,6 +33,7 @@ class User(AbstractUser):
 class billsCategory(models.Model):
     category_id = models.AutoField(primary_key=True)
     category = models.CharField(max_length=30)
+    owner_user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     REQUIRED_FIELDS = ['category']
 

@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models.fields import *
-from django_utils.translation import gettext_lazy as _
 
 
 # Create your models here.
@@ -84,12 +83,21 @@ class Revenue(models.Model):
 
 class Bills(models.Model):
 
-    class Payment_Method(models.TextChoices):
-        CREDIT_CARD = 'cre', _('Credit Card')
-        DEBIT_CARD = 'deb', _('Debit Card')
-        PIX = 'pix',  _('Pix')
-        CASH = 'cas', _('Cash')
-        OTHERS = 'oth', _('Others')
+    CREDIT = 'CRD'
+    DEBIT = 'DBT'
+    CASH = 'CSH'
+    PIX = 'PIX'
+    BOLETO = 'BLT'
+    OTHER = 'OTH'
+
+    PAYMENT_METHOD_CHOICES = {
+        CREDIT: 'Credit Card',
+        DEBIT: 'Debit Card',
+        CASH: 'Cash',
+        PIX: 'Pix',
+        BOLETO: 'Boleto',
+        OTHER: 'Other',
+    }
 
     bill_id = models.AutoField(primary_key=True)
 
@@ -105,13 +113,13 @@ class Bills(models.Model):
 
     payment_method = models.CharField(
         max_length=3,
-        choices=payment_method.choices,
-        default=payment_method.CREDIT_CARD
+        choices=PAYMENT_METHOD_CHOICES,
+        default=CREDIT,
         )
 
     has_installments = models.BooleanField(default=False)
 
-    category = models.ForeignKey(billsCategory, on_delete=None, null=True)
+    category = models.ForeignKey(billsCategory, null=True, on_delete=models.SET_NULL)
 
     REQUIRED_FIELDS = ['owner_user', 'description', 'value', 'bill_date', 'is_recurrent', 'has_installments', 'payment_method']
 

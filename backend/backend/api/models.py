@@ -121,7 +121,7 @@ class Bills(models.Model):
 
     category = models.ForeignKey(billsCategory, null=True, on_delete=models.SET_NULL)
 
-    REQUIRED_FIELDS = ['owner_user', 'description', 'value', 'bill_date', 'is_recurrent', 'has_installments', 'payment_method']
+    REQUIRED_FIELDS = ['description', 'value', 'bill_date', 'is_recurrent', 'has_installments', 'payment_method']
 
     def __str__(self):
         return f"Bill { self.description } from { self.owner_user }"

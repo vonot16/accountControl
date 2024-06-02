@@ -7,6 +7,7 @@ import jwt, datetime
 from ..models import User
 from ..serializers import UserSerializer
 
+
 @api_view(['POST'])
 def register(request):
     data = JSONParser().parse(request)
@@ -15,6 +16,7 @@ def register(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def login(request):
@@ -31,9 +33,12 @@ def login(request):
         'iat': datetime.datetime.utcnow()
     }
     token = jwt.encode(payload, 'secret', algorithm='HS256')
-    Response().set_cookie('app_user_token', token, httponly=True)
 
-    return Response({'message': 'User logged in', 'token':token}, status=status.HTTP_202_ACCEPTED)
+    try:
+        Response().set_cookie('app_user_token', token, httponly=True)
+        return Response({'message': 'User logged in', 'token':token}, status=status.HTTP_202_ACCEPTED)
+    except:
+        return Response({'message': 'Verify if cookies are allowed'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -44,3 +49,4 @@ def logout(request):
         return Response({'message': 'User logged out'}, status=status.HTTP_200_OK)
     except:
         return Response({'message': 'User not logged out'}, status=status.HTTP_400_BAD_REQUEST)
+

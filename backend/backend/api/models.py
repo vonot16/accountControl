@@ -1,14 +1,10 @@
 from django.db import models
-
-from django.db.models.fields import EmailField
-
 from django.contrib.auth.models import AbstractUser
-
+from django.db.models.fields import *
+from django_utils.translation import gettext_lazy as _
 
 
 # Create your models here.
-
-
 
 class User(AbstractUser):
 
@@ -35,7 +31,14 @@ class User(AbstractUser):
 
         return f"Name:{ self.first_name, self.last_name } Email:{ self.email}"
 
+class billsCategory(models.Model):
+    category_id = models.AutoField(primary_key=True)
+    category = models.CharField(max_length=30)
 
+    REQUIRED_FIELDS = ['category']
+
+    def __str__(self):
+        return f"Category { self.category }"
 
 class CreditCard(models.Model):
 
@@ -60,7 +63,6 @@ class CreditCard(models.Model):
 
         return f"Card { self.card_name } from { self.owner_user }"
 
-
 class Revenue(models.Model):
 
     revenue_id = models.AutoField(primary_key=True)
@@ -82,6 +84,13 @@ class Revenue(models.Model):
 
 class Bills(models.Model):
 
+    class Payment_Method(models.TextChoices):
+        CREDIT_CARD = 'cre', _('Credit Card')
+        DEBIT_CARD = 'deb', _('Debit Card')
+        PIX = 'pix',  _('Pix')
+        CASH = 'cas', _('Cash')
+        OTHERS = 'oth', _('Others')
+
     bill_id = models.AutoField(primary_key=True)
 
     owner_user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -92,21 +101,41 @@ class Bills(models.Model):
 
     bill_date = models.DateField()
 
-    isRecurrent = models.BooleanField(default=False)
-
-    hasInstallments = models.BooleanField(default=False)
+    is_recurrent = models.BooleanField(default=False)
 
     payment_method = models.CharField(
-        max_length=30,
-        choices=[
-            ('credit_card', 'Credit Card'),
-            ('debit_card', 'Debit Card'),
-            ('pix', 'Pix'),
-            ('cash', 'Cash'),
-            ('others', 'Others')
-        ],)
+        max_length=3,
+        choices=payment_method.choices,
+        default=payment_method.CREDIT_CARD
+        )
 
-    REQUIRED_FIELDS = ['owner_user', 'description', 'value', 'bill_date', 'isRecurrent']
+    has_installments = models.BooleanField(default=False)
+
+    category = models.ForeignKey(billsCategory, on_delete=None, null=True)
+
+    REQUIRED_FIELDS = ['owner_user', 'description', 'value', 'bill_date', 'is_recurrent', 'has_installments', 'payment_method']
 
     def __str__(self):
         return f"Bill { self.description } from { self.owner_user }"
+
+class Installments(models.Model):
+    
+        installment_id = models.AutoField(primary_key=True)
+
+        bill_id = models.ForeignKey(Bills, on_delete=models.CASCADE)
+
+        card_id = models.ForeignKey(CreditCard, on_delete=models.CASCADE)
+
+        installment_number = models.IntegerField()
+    
+        installments_total_number = models.IntegerField()
+    
+        installment_date = models.DateField()
+
+        is_payed = models.BooleanField(default=False)
+    
+        REQUIRED_FIELDS = ['bill_id', 'card_id', 'installment_number', 'installments_total_number', 'installment_date', 'is_payed']
+    
+        def __str__(self):
+            return f"Installment { self.installment_number } of { installments_total_number } from { self.bill_id }"
+

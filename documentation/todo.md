@@ -4,7 +4,7 @@
 
 - [ ] Model the E-R Diagram
 - [ ] Model the Case Use Diagram
-- [ ] Model the Class Diagram
+- [ x ] Model the Class Diagram
 
 ## Back End
 
